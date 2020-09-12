@@ -1,12 +1,11 @@
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProjetoExemplo.Infrastructure.CrossCutting.IoC;
-using ProjetoExemplo.Infrastructure.Data;
+using Microsoft.OpenApi.Models;
 
 namespace ProjetoExemplo
 {
@@ -24,8 +23,18 @@ namespace ProjetoExemplo
         {
             services.AddControllers();
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<SqlContext>(opt =>
-                opt.UseNpgsql(Configuration.GetConnectionString("postgres")));
+           /* services.AddEntityFrameworkNpgsql().AddDbContext<SqlContext>(opt =>
+                opt.UseNpgsql(Configuration.GetConnectionString("postgres")));*/
+
+            services.AddSwaggerGen(c =>
+            { 
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Projeto Exemplo API",
+                    Description = "A simple example ASP.NET Core Web API"
+                });
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -40,6 +49,13 @@ namespace ProjetoExemplo
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             app.UseHttpsRedirection();
 
